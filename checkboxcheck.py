@@ -13,7 +13,6 @@ import functools
 path = "C:/Users/Joshua/Desktop/RPA_Test/testfolder/boxhighlight/"
 checkedP = "C:/Users/Joshua/Desktop/RPA_Test/testfolder/checked/"
 uncheckedP = "C:/Users/Joshua/Desktop/RPA_Test/testfolder/unchecked/"
-unconfidentP = "C:/Users/Joshua/Desktop/RPA_Test/testfolder/unconfident/"
 included_extensions = ['png','PNG']
 
 THRESHOLD = 117

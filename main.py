@@ -2,6 +2,14 @@
 # pip install PyMuPDF
 # pip install opencv-python numpy Pillow
 
+from imutils.perspective import four_point_transform
+from imutils import contours
+import imutils
+from pathlib import Path
+from os import listdir
+import os
+import shutil
+import functools
 import fitz
 import glob
 import cv2
@@ -20,9 +28,25 @@ from numpy import *
 # destDir: C:/Temp/checkbox/Output
 
 # Local folders
-sourceDir = 'C:/Temp/checkbox/Src/'
-dirPNG = 'C:/Temp/checkbox/PNG/'
-destDir = 'C:/Temp/checkbox/BoxHiglight/'
+sourceDir = 'C:/Users/Joshua/Desktop/RPA_Test/testfolder/'
+dirPNG = 'C:/Users/Joshua/Desktop/RPA_Test/testfolder/PNG/'
+destDir = 'C:/Users/Joshua/Desktop/RPA_Test/testfolder/Boxhighlight/'
+
+def pix(x,x1,y,y1,img):
+    imgCrop = img[x:x1,y:y1]
+    gray = cv2.cvtColor(imgCrop, cv2.COLOR_BGR2GRAY)
+    ret, bw = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY_INV)
+    contours, hierarchy = cv2.findContours(bw, cv2.RETR_CCOMP, 1)
+
+    n_white_pix = np.sum(imgCrop == 255)
+    n_white_pix = np.sum(bw == 255)
+    print('whitepixels imgCrop count: ', n_white_pix)
+    print('whitepixels bw count: ', n_white_pix)
+    #print(img.shape) # Print image shape
+    cv2.imshow("original", imgCrop)
+    cv2.waitKey(0)
+    cv2.imshow("greyscale", bw)
+    cv2.destroyAllWindows()
 
 # To get better resolution
 zoom_x = 2.0  # horizontal zoom
@@ -82,9 +106,6 @@ for filename in pngFiles:
     _, binaryImage = cv2.threshold(grayImage, 150, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
     binaryImage = 255 - binaryImage
 
-    # Image thresholding v2
-    # _, binaryImage = cv2.threshold(grayImage, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-
     # Show image
     if showImages:
         Image.fromarray(binaryImage).show()
@@ -104,6 +125,7 @@ for filename in pngFiles:
 
     # Vertical kernel on the image
     img_bin_v = cv2.morphologyEx(binaryImage, cv2.MORPH_OPEN, kernel_v)
+
 
     # Show image with horizontal lines only and vertical lines only
     if showImages:
@@ -125,12 +147,27 @@ for filename in pngFiles:
         print('rectangle : (x , y) = ', x, y)
         print('size: w, h', w, h)
         # Only draw an rectangle on image within a certain size range, width and height
-        if (w < 20) and (w > 5) and (h < 20) and (h > 4):
-            print('rectangle ', squares, ': (x , y) = ', x, y)
-            print('size: w, h', w, h)
-            cv2.rectangle(inputImage, (x, y), (x + w, y + h), (255, 0, 0), 2)
-            cv2.putText(inputImage, str(squares), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
-            squares += 1
+        if (w < 15) and (w > 6) and (h < 15) and (h > 6):
+                print('rectangle ', squares, ': (x , y) = ', x, y)
+                print('size: w, h', w, h)
+                imgCrop = inputImage[y:y+h,x:x+w]
+                gray = cv2.cvtColor(imgCrop, cv2.COLOR_BGR2GRAY)
+                ret, bw = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY_INV)
+                contours, hierarchy = cv2.findContours(bw, cv2.RETR_CCOMP, 1)
+                n_white_pix = np.sum(imgCrop == 255)
+                n_white_pix = np.sum(bw == 255)
+                print('whitepixels imgCrop count: ', n_white_pix)
+                print('whitepixels bw count: ', n_white_pix)
+                cv2.imshow("original", imgCrop)
+                cv2.waitKey(0)
+                cv2.destroyAllWindows()
+                cv2.putText(inputImage, str(squares), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
+                cv2.rectangle(inputImage, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                
+                
+        squares += 1
+
+            
 
     # Show image with found checkboxes highlighted in red
     if showImages:
@@ -144,3 +181,4 @@ for filename in pngFiles:
 
     # Increase counter
     i += 1
+
