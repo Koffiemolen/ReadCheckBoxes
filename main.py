@@ -31,22 +31,24 @@ from numpy import *
 sourceDir = 'C:/Users/Joshua/Desktop/RPA_Test/testfolder/'
 dirPNG = 'C:/Users/Joshua/Desktop/RPA_Test/testfolder/PNG/'
 destDir = 'C:/Users/Joshua/Desktop/RPA_Test/testfolder/Boxhighlight/'
+unchecked = 'C:/Users/joshua/Desktop/RPA_Test/testfolder/unchecked/'
+checked = 'C:/Users/joshua/Desktop/RPA_Test/testfolder/checked/'
 
-def pix(x,x1,y,y1,img):
-    imgCrop = img[x:x1,y:y1]
-    gray = cv2.cvtColor(imgCrop, cv2.COLOR_BGR2GRAY)
-    ret, bw = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY_INV)
-    contours, hierarchy = cv2.findContours(bw, cv2.RETR_CCOMP, 1)
+# def pix(x,x1,y,y1,img):
+#     imgCrop = img[x:x1,y:y1]
+#     gray = cv2.cvtColor(imgCrop, cv2.COLOR_BGR2GRAY)
+#     ret, bw = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY_INV)
+#     contours, hierarchy = cv2.findContours(bw, cv2.RETR_CCOMP, 1)
 
-    n_white_pix = np.sum(imgCrop == 255)
-    n_white_pix = np.sum(bw == 255)
-    print('whitepixels imgCrop count: ', n_white_pix)
-    print('whitepixels bw count: ', n_white_pix)
-    #print(img.shape) # Print image shape
-    cv2.imshow("original", imgCrop)
-    cv2.waitKey(0)
-    cv2.imshow("greyscale", bw)
-    cv2.destroyAllWindows()
+#     n_white_pix = np.sum(imgCrop == 255)
+#     n_white_pix = np.sum(bw == 255)
+#     print('whitepixels imgCrop count: ', n_white_pix)
+#     print('whitepixels bw count: ', n_white_pix)
+#     #print(img.shape) # Print image shape
+#     cv2.imshow("original", imgCrop)
+#     cv2.waitKey(0)
+#     cv2.imshow("greyscale", bw)
+#     cv2.destroyAllWindows()
 
 # To get better resolution
 zoom_x = 2.0  # horizontal zoom
@@ -158,17 +160,26 @@ for filename in pngFiles:
                 gray = cv2.cvtColor(imgCrop, cv2.COLOR_BGR2GRAY)
                 ret, bw = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY_INV)
                 contours, hierarchy = cv2.findContours(bw, cv2.RETR_CCOMP, 1)
-                n_white_pix = np.sum(imgCrop == 255)
-                #n_white_pix = np.sum(bw == 255)
+                #n_white_pix = np.sum(imgCrop == 255)
+                n_white_pix = np.sum(bw == 255)
+                    
                 #cv2.imshow('2',)
-
                 print('whitepixels imgCrop count: ', n_white_pix)
                 print('whitepixels bw count: ', n_white_pix)
-                cv2.imshow("original", imgCrop)
-                cv2.waitKey(0)
-                cv2.destroyAllWindows()
+                # cv2.imshow("original", imgCrop)
+                # cv2.waitKey(0)
+                # cv2.destroyAllWindows()
                 cv2.putText(inputImage, str(squares), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
                 cv2.rectangle(inputImage, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                # kijkt naar de hoeveelheid pixels in de checkbox, als het er onder is wordt de file naar checked folder gestuurd
+                if n_white_pix <= 38:
+                    shutil.copy(os.path.join(filename,), unchecked)
+                    print('deze gaat naar niet checked')
+
+                # als de waarde boven 38 is wordt de file naar checked gestuurd
+                else:
+                    shutil.copy(os.path.join(filename), checked)
+                    print('Deze is checked')
                 count += 1
                 
             squares += 1
