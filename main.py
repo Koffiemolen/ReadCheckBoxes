@@ -143,19 +143,25 @@ for filename in pngFiles:
     _, labels, stats, _ = cv2.connectedComponentsWithStats(~img_bin_final, connectivity=8, ltype=cv2.CV_32S)
 
     squares = 0 # Counter for numbering potential checkboxes
+    
     for x, y, w, h, area in stats[2:]:
-        print('rectangle : (x , y) = ', x, y)
-        print('size: w, h', w, h)
+        count = 0
+        #print('rectangle : (x , y) = ', x, y)
+        #print('size: w, h', w, h)
         # Only draw an rectangle on image within a certain size range, width and height
-        if (w < 15) and (w > 6) and (h < 15) and (h > 6):
+        # 1000:1300,50:110
+        if y in range(1000,1300) and x in range(50,110):
+            if (w < 20) and (w > 6) and (h < 20) and (h > 6):
                 print('rectangle ', squares, ': (x , y) = ', x, y)
-                print('size: w, h', w, h)
+                #print('size: w, h', w, h)
                 imgCrop = inputImage[y:y+h,x:x+w]
                 gray = cv2.cvtColor(imgCrop, cv2.COLOR_BGR2GRAY)
                 ret, bw = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY_INV)
                 contours, hierarchy = cv2.findContours(bw, cv2.RETR_CCOMP, 1)
                 n_white_pix = np.sum(imgCrop == 255)
-                n_white_pix = np.sum(bw == 255)
+                #n_white_pix = np.sum(bw == 255)
+                #cv2.imshow('2',)
+
                 print('whitepixels imgCrop count: ', n_white_pix)
                 print('whitepixels bw count: ', n_white_pix)
                 cv2.imshow("original", imgCrop)
@@ -163,9 +169,11 @@ for filename in pngFiles:
                 cv2.destroyAllWindows()
                 cv2.putText(inputImage, str(squares), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
                 cv2.rectangle(inputImage, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                count += 1
                 
-                
-        squares += 1
+            squares += 1
+        
+    #print("Number of boxes found: ",count,filename)
 
             
 
